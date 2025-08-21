@@ -1,0 +1,8 @@
+ip = "127.0.0.1"
+port = "3000"
+owner = "NixOS"
+repo = "nixpkgs"
+github_token = "your_token"
+verbose = false
+refresh = 0
+theme = "dark"
