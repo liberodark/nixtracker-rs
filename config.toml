@@ -1,0 +1,29 @@
+base_url = "https://domain.com"
+ip = "127.0.0.1"
+port = 3000
+owner = "NixOS"
+repo = "nixpkgs"
+github_token = "your_token"
+verbose = false
+refresh = 0
+theme = "dark"
+
+[cache]
+enabled = true
+max_entries = 500
+ttl_seconds = 300
+
+[rate_limit]
+enabled = true              # Enable rate limiting
+global_rps = 30             # 30 requests/second globally (conservative for 5000/hour)
+per_ip_rps = 2              # 2 requests/second per IP
+global_burst = 50           # Allow bursts up to 50 requests
+per_ip_burst = 10           # Allow bursts up to 10 requests per IP
+excluded_paths = ["/health", "/metrics", "/favicon.ico"]
+enable_jitter = false       # No jitter needed with high limits
+jitter_ms = 10
+
+[timeouts]
+global_secs = 30
+connect_secs = 10
+request_total_secs = 45
