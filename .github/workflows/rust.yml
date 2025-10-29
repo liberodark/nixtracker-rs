@@ -129,12 +129,12 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Download Linux binary
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: nixtracker-rs-linux
           path: ./
       - name: Download Linux tarball
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: nixtracker-rs-linux-tarball
           path: ./
