@@ -554,17 +554,18 @@ async fn handle_request(
         println!("Request: {} {} from {}", method, path, client_ip);
     }
 
-    if !matches!(path, "/health" | "/metrics") && state.config.rate_limit.enabled {
-        if let Err(e) = state.rate_limiter.check_request(client_ip).await {
-            if state.config.verbose {
-                println!("Rate limit exceeded for {}: {:?}", client_ip, e);
-            }
-            return Ok(e.to_response());
+    if !matches!(path, "/health" | "/metrics")
+        && state.config.rate_limit.enabled
+        && let Err(e) = state.rate_limiter.check_request(client_ip).await
+    {
+        if state.config.verbose {
+            println!("Rate limit exceeded for {}: {:?}", client_ip, e);
         }
+        return Ok(e.to_response());
     }
 
     // IMPORTANT: Check /api/pr/ BEFORE /pr/ because /api/pr/ starts with /pr/
-    let response = if method == Method::GET {
+    if method == Method::GET {
         if path == "/" {
             Ok(serve_html(index_page(&state.config)))
         } else if path.starts_with("/api/pr/") {
@@ -669,17 +670,15 @@ async fn handle_request(
         let mut res = Response::new(Full::new(Bytes::from("Method Not Allowed")));
         *res.status_mut() = StatusCode::METHOD_NOT_ALLOWED;
         Ok(res)
-    };
-
-    response
+    }
 }
 
 fn extract_pr_number(query: &str) -> Result<u64> {
     for pair in query.split('&') {
-        if let Some((key, value)) = pair.split_once('=') {
-            if key == "pr" {
-                return value.parse::<u64>().map_err(|_| "Invalid PR number".into());
-            }
+        if let Some((key, value)) = pair.split_once('=')
+            && key == "pr"
+        {
+            return value.parse::<u64>().map_err(|_| "Invalid PR number".into());
         }
     }
     Err("PR number not found in query".into())
@@ -696,7 +695,7 @@ fn serve_html(markup: Markup) -> Response<Full<Bytes>> {
 
 fn serve_json<T: Serialize>(data: T) -> Response<Full<Bytes>> {
     let json = serde_json::to_string(&data).unwrap_or_else(|_| "{}".to_string());
-    let response = Response::builder() // ← Ajouter "let response ="
+    let response = Response::builder()
         .header("content-type", "application/json")
         .body(Full::new(Bytes::from(json)))
         .unwrap();

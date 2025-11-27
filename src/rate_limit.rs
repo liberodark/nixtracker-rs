@@ -193,30 +193,26 @@ pub struct RateLimitStats {
 }
 
 pub fn extract_client_ip(req: &Request<Incoming>) -> IpAddr {
-    if let Some(forwarded) = req.headers().get("x-forwarded-for") {
-        if let Ok(forwarded_str) = forwarded.to_str() {
-            if let Some(first_ip) = forwarded_str.split(',').next() {
-                if let Ok(addr) = first_ip.trim().parse::<IpAddr>() {
-                    return addr;
-                }
-            }
-        }
+    if let Some(forwarded) = req.headers().get("x-forwarded-for")
+        && let Ok(forwarded_str) = forwarded.to_str()
+        && let Some(first_ip) = forwarded_str.split(',').next()
+        && let Ok(addr) = first_ip.trim().parse::<IpAddr>()
+    {
+        return addr;
     }
 
-    if let Some(real_ip) = req.headers().get("x-real-ip") {
-        if let Ok(ip_str) = real_ip.to_str() {
-            if let Ok(addr) = ip_str.parse::<IpAddr>() {
-                return addr;
-            }
-        }
+    if let Some(real_ip) = req.headers().get("x-real-ip")
+        && let Ok(ip_str) = real_ip.to_str()
+        && let Ok(addr) = ip_str.parse::<IpAddr>()
+    {
+        return addr;
     }
 
-    if let Some(cf_ip) = req.headers().get("cf-connecting-ip") {
-        if let Ok(ip_str) = cf_ip.to_str() {
-            if let Ok(addr) = ip_str.parse::<IpAddr>() {
-                return addr;
-            }
-        }
+    if let Some(cf_ip) = req.headers().get("cf-connecting-ip")
+        && let Ok(ip_str) = cf_ip.to_str()
+        && let Ok(addr) = ip_str.parse::<IpAddr>()
+    {
+        return addr;
     }
 
     "127.0.0.1".parse().unwrap()

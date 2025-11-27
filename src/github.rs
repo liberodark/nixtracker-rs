@@ -158,10 +158,9 @@ pub async fn check_branch_propagation(state: &AppState, pr: &PullRequest) -> Vec
                     ),
                 )
                 .await
+                    && let Some(status_str) = compare.get("status").and_then(|s| s.as_str())
                 {
-                    if let Some(status_str) = compare.get("status").and_then(|s| s.as_str()) {
-                        status.has_commit = status_str == "ahead" || status_str == "identical";
-                    }
+                    status.has_commit = status_str == "ahead" || status_str == "identical";
                 }
 
                 status
